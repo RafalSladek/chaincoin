@@ -270,6 +270,7 @@ sudo -u $COINUSER -H sh -c "echo '{ \"timestamp\": \"`date`\", \"details\": ['; 
 EOF
 
 chmod +x /usr/lib/bin/chainstatus
+}
 
 function motd() {
   cat << EOF >> /etc/update-motd.d/99-${DEFAULTCOINUSER}
