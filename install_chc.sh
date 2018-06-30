@@ -255,20 +255,20 @@ function important_information() {
 }
 
 function status() {
-cat << EOF >> /usr/lib/bin/chainstatus
+cat << EOF >> ${BIN_TARGET}/chainstatus
 #!/bin/bash
 PUBLIC_IP=$(curl -s ipecho.net/plain)
 sudo -u $COINUSER -H sh -c "echo '{ \"timestamp\": \"`date`\", \"details\": ['; $COINCLI getinfo; echo ','; $COINCLI masternode list full $PUBLIC_IP; echo ']}'"
 EOF
 
-chmod +x /usr/lib/bin/chainstatus
+chmod +x ${BIN_TARGET}/chainstatus
 }
 
 function motd() {
   cat << EOF >> /etc/update-motd.d/99-${DEFAULTCOINUSER}
 #!/bin/bash
 printf "\n${COINCLI} masternode status\n"
-/usr/local/bin/chainstatus
+${BIN_TARGET}/chainstatus
 printf "\n"
 EOF
 chmod +x /etc/update-motd.d/99-${DEFAULTCOINUSER}
