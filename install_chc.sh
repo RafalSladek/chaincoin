@@ -44,14 +44,12 @@ if [ -n "$(pidof $COINDAEMON)" ]; then
   echo -e "${GREEN}\c"
   read -e -p "$COINDAEMON is already running. Do you want to add another MN? [Y/N]" NEW_COIN
   echo -e "{NC}"
-  clear
 else
   NEW_COIN="new"
 fi
 }
 
 function prepare_system() {
-
 echo -e "Prepare the system to install $COINTITLE master node."
 apt-get update >/dev/null 2>&1
 DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y -qq upgrade >/dev/null 2>&1
@@ -64,10 +62,9 @@ apt-get install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--fo
         git wget pwgen curl ufw tree vim htop \
         libprotobuf-dev libevent-dev libzmq3-dev \
         libboost-system-dev libboost-filesystem-dev libboost-chrono-dev libboost-program-options-dev libboost-test-dev libboost-thread-dev \
-        automake libdb++-dev build-essential libtool autotools-dev autoconf pkg-config libssl-dev libboost-all-dev \
+        automake build-essential libtool autotools-dev autoconf pkg-config libssl-dev libboost-all-dev \
         libminiupnpc-dev software-properties-common python-software-properties g++ \
-        libdb4.8-dev libdb4.8++-dev 
-clear
+        libdb4.8-dev libdb4.8++-dev
 
 
 if [ "$?" -gt "0" ];
@@ -87,7 +84,6 @@ if [ "$?" -gt "0" ];
  exit 1
 fi
 
-clear
 echo -e "Checking if swap space is needed."
 PHYMEM=$(free -g|awk '/^Mem:/{print $2}')
 SWAP=$(swapon -s)
@@ -101,10 +97,10 @@ if [[ "$PHYMEM" -lt "2" && -z "$SWAP" ]];
 else
   echo -e "${GREEN}The server running with at least 2G of RAM, or SWAP exists.${NC}"
 fi
-clear
 }
 
 function compile() {
+  echo "compile..."
   echo -e "Clone git repo and compile it. This may take some time."
 
   git clone $COIN_REPO $TMP_FOLDER
@@ -114,7 +110,6 @@ function compile() {
     make -j$(nproc)
     make install
   compile_error $DEFAULTCOINUSER
-  clear
 }
 
 function enable_firewall() {
@@ -187,7 +182,6 @@ function ask_user() {
     USERPASS=$(tr -cd '[:alnum:]' < /dev/urandom | fold -w12 | head -n1)
     echo "$COINUSER:$USERPASS" | chpasswd
   else
-    clear
     echo -e "${RED}User exits. Please enter another username: ${NC}"
     ask_user
   fi
@@ -199,7 +193,6 @@ function check_port() {
   ask_port
 
   while [[ ${PORTS[@]} =~ $COINPORT ]] || [[ ${PORTS[@]} =~ $[COINPORT+1] ]]; do
-    clear
     echo -e "${RED}Port in use, please choose another port:${NF}"
     ask_port
   done
@@ -282,6 +275,7 @@ chmod +x /etc/update-motd.d/99-${DEFAULTCOINUSER}
 }
 
 function setup_node() {
+  echo "setup node..."
   ask_user
   check_port
   create_config
@@ -295,7 +289,7 @@ function setup_node() {
 }
 
 ##### Main #####
-clear
+
 
 checks
 if [[ ("$NEW_COIN" == "y" || "$NEW_COIN" == "Y") ]]; then
