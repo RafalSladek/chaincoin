@@ -8,7 +8,7 @@ DEFAULTCOINPORT=11994
 DEFAULTORGANAME="chaincoin"
 
 COINTITLE="Chaincoin"
-COINDAEMON="arcticcoind"
+COINDAEMON="chaincoind"
 COINCLI="chaincoin-cli"
 CONFIG_FILE="chaincoin.conf"
 COIN_REPO="https://github.com/chaincoin-legacy/chaincoin.git"
@@ -61,7 +61,7 @@ apt-add-repository -y ppa:bitcoin/bitcoin >/dev/null 2>&1
 echo -e "Installing required packages, it may take some time to finish.${NC}"
 apt-get update >/dev/null 2>&1
 apt-get install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" \
-        git wget pwgen curl ufw \
+        git wget pwgen curl ufw tree vim htop \
         libprotobuf-dev libevent-dev libzmq3-dev \
         libboost-system-dev libboost-filesystem-dev libboost-chrono-dev libboost-program-options-dev libboost-test-dev libboost-thread-dev \
         automake libdb++-dev build-essential libtool autotools-dev autoconf pkg-config libssl-dev libboost-all-dev \
@@ -78,7 +78,7 @@ if [ "$?" -gt "0" ];
     echo "apt-add-repository -y ppa:bitcoin/bitcoin"
     echo "apt-get update"
     echo "apt install -y         
-        git wget pwgen curl ufw \
+        git wget pwgen curl ufw tree vim htop \
         libprotobuf-dev libevent-dev libzmq3-dev \
         libboost-system-dev libboost-filesystem-dev libboost-chrono-dev libboost-program-options-dev libboost-test-dev libboost-thread-dev \
         automake libdb++-dev build-essential libtool autotools-dev autoconf pkg-config libssl-dev libboost-all-dev \
@@ -105,8 +105,7 @@ clear
 }
 
 function compile() {
-  echo -e "Clone git repo and compile it. This may take some time. Press a key to continue."
-  read -n 1 -s -r -p ""
+  echo -e "Clone git repo and compile it. This may take some time."
 
   git clone $COIN_REPO $TMP_FOLDER
   cd $TMP_FOLDER
@@ -295,7 +294,6 @@ function setup_node() {
   motd
 }
 
-
 ##### Main #####
 clear
 
@@ -307,6 +305,7 @@ elif [[ "$NEW_COIN" == "new" ]]; then
   prepare_system
   compile
   setup_node
+  exit 0
 else
   echo -e "${GREEN}$COINDAEMON already running.${NC}"
   exit 0
