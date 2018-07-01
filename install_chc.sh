@@ -236,7 +236,7 @@ logtimestamps=1
 maxconnections=256
 masternode=1
 externalip=$NODEIP
-goldminenodeprivkey=$COINKEY
+masternodeprivkey=$COINKEY
 EOF
   chown -R $COINUSER: $COINFOLDER >/dev/null
 }
@@ -257,8 +257,9 @@ function important_information() {
 function status() {
 cat << EOF >> ${BIN_TARGET}/chainstatus
 #!/bin/bash
-PUBLIC_IP=$(curl -s ipecho.net/plain)
-sudo -u $COINUSER -H sh -c "echo '{ \"timestamp\": \"`date`\", \"details\": ['; $COINCLI getinfo; echo ','; $COINCLI masternode list full $PUBLIC_IP; echo ']}'"
+COINUSER=chaincoin
+PUBLIC_IP='$(curl -s ipecho.net/plain)'
+sudo -u '$COINUSER' -H sh -c "echo '{ \"timestamp\": \"`date`\", \"details\": ['; $COINCLI getinfo; echo ','; $COINCLI masternode list full '$PUBLIC_IP'; echo ']}'"
 EOF
 
 chmod +x ${BIN_TARGET}/chainstatus
