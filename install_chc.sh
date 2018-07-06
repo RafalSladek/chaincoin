@@ -11,7 +11,7 @@ COINTITLE="Chaincoin"
 COINDAEMON="chaincoind"
 COINCLI="chaincoin-cli"
 CONFIG_FILE="chaincoin.conf"
-COIN_REPO="https://github.com/chaincoin-legacy/chaincoin.git"
+COIN_REPO="https://github.com/ChainCoin/ChainCoin.git"
 
 TMP_FOLDER=$(mktemp -d)
 BIN_TARGET="/usr/local/bin"
@@ -80,7 +80,7 @@ if [ "$?" -gt "0" ];
         libboost-system-dev libboost-filesystem-dev libboost-chrono-dev libboost-program-options-dev libboost-test-dev libboost-thread-dev \
         automake libdb++-dev build-essential libtool autotools-dev autoconf pkg-config libssl-dev libboost-all-dev \
         libminiupnpc-dev software-properties-common python-software-properties g++ \
-        libdb4.8-dev libdb4.8++-dev "
+        libdb4.8-dev libdb4.8++-dev python-virtualenv virtualenv"
  exit 1
 fi
 
@@ -103,7 +103,7 @@ function compile() {
   echo "compile..."
   echo -e "Clone git repo and compile it. This may take some time."
 
-  git clone $COIN_REPO $TMP_FOLDER
+  git clone $COIN_REPO $TMP_FOLDER -b 0.16
   cd $TMP_FOLDER
     ./autogen.sh
     ./configure
@@ -223,7 +223,7 @@ function create_key() {
     echo -e "${RED}Arcticcoind server couldn't start. Check /var/log/syslog for errors.{$NC}"
     exit 1
     fi
-  COINKEY=$(sudo -u $COINUSER $BIN_TARGET/$COINCLI -conf=$COINFOLDER/$CONFIG_FILE -datadir=$COINFOLDER goldminenode genkey)
+  COINKEY=$(sudo -u $COINUSER $BIN_TARGET/$COINCLI -conf=$COINFOLDER/$CONFIG_FILE -datadir=$COINFOLDER masternode genkey)
   sudo -u $COINUSER $BIN_TARGET/$COINCLI -conf=$COINFOLDER/$CONFIG_FILE -datadir=$COINFOLDER stop
   fi
 }
@@ -275,6 +275,14 @@ EOF
 chmod +x /etc/update-motd.d/99-${DEFAULTCOINUSER}
 }
 
+function sentinel() {
+
+sudo -u '$COINUSER' -H sh -c "git clone https://github.com/chaincoin/sentinel.git "
+sudo -u '$COINUSER' -H sh -c "cd sentinel && virtualenv ./venv && ./venv/bin/pip install -r requirements.txt"
+sudo crontab -u $COINUSER -e
+sudo echo "* * * * * cd $COINHOME/sentinel && ./venv/bin/python bin/sentinel.py >/dev/null 2>&1" >> /var/spool/cron/crontabs/$COINUSER
+}
+
 function setup_node() {
   echo "setup node..."
   ask_user
@@ -287,6 +295,7 @@ function setup_node() {
   important_information
   status
   motd
+  sentinel
 }
 
 ##### Main #####
